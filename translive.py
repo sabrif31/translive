@@ -230,6 +230,13 @@ arg_parser.add_argument(
     default=False,
     help="Set settings",
 )
+arg_parser.add_argument(
+    "-a",
+    "--app",
+    type=bool,
+    default=False,
+    help="Create app .exe",
+)
 
 def take_textshot(langs, interval):
     ensure_tesseract_installed()
@@ -327,6 +334,11 @@ def main():
     \n(Neural Network Translate)''', "blue"))
 
     args = arg_parser.parse_args()
+
+    if args.app == True:
+        print(colored('''[INFO] Create app .exe ''', 'blue'))
+        os.system('pyinstaller --onefile translive.py')
+        sys.exit(0)
 
     """Configure API KEY and source Translate"""
     path_exists_settings = os.path.exists("config/api-key.json")
