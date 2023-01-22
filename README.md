@@ -21,11 +21,6 @@ python translive.py
 ```
 To update settings:
 ```           
-python translive.py setup
-```
-
-## Setup
-```           
 python translive.py --setup=True
 ```
 
