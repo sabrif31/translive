@@ -170,7 +170,7 @@ class Translator(Transitive):
 
     def __init__(self, box_constant = 416, collect_data = False, mouse_delay = 0.0001, debug = False):
         t = colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO QUIT''', "blue")
-        print(colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO QUIT\n[INFO] PRESS 'F4' TO RESET ALL\n[INFO] PRESS 'F6' TO DELETE CONFIG.json''', "blue"))
+        print(colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO QUIT\n[INFO] PRESS 'F4' TO RESET ALL\n[INFO] PRESS 'F6' TO DELETE CONFIG.json\n[INFO] PRESS 'F7' TO RE-SELECT ZONE AT TRANSLATE''', "blue"))
 
     def on_take_screenshot(apiKey="", deep_translator="deepl"):
         # Get settings position of the text
@@ -292,6 +292,10 @@ def on_release(key):
         '''SETUP SETTINGS'''
         if key == keyboard.Key.f6:
             setupDeeplApiKey()
+        '''SELECT NEW ZONE'''
+        if key == keyboard.Key.f7:
+            args = arg_parser.parse_args()
+            take_textshot(args.langs, args.interval)
     except NameError:
         pass
 
