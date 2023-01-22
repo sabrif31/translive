@@ -52,7 +52,7 @@ class Transitive(QtWidgets.QWidget):
         with open('config/config.json', 'w') as outfile:
             json.dump(position_settings, outfile)
 
-        print('[SAVED] Coordinate is saved')
+        print(colored('''[SAVED] Coordinate is saved''', 'blue'))
 
     def getWindow(self):
         return self._screen.grabWindow(0)
@@ -169,8 +169,7 @@ class Translator(Transitive):
     path = r'%s\\img\\translate.png' % current_folder
 
     def __init__(self, box_constant = 416, collect_data = False, mouse_delay = 0.0001, debug = False):
-        t = colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO QUIT''', "blue")
-        print(colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO QUIT\n[INFO] PRESS 'F4' TO RESET ALL\n[INFO] PRESS 'F6' TO DELETE CONFIG.json\n[INFO] PRESS 'F7' TO RE-SELECT ZONE AT TRANSLATE''', "blue"))
+        print(colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO RESET ALL\n[INFO] PRESS 'F4' TO QUIT\n[INFO] PRESS 'F6' TO SET SETTINGS\n[INFO] PRESS 'F7' TO RE-SELECT ZONE AT TRANSLATE''', "blue"))
 
     def on_take_screenshot(apiKey="", deep_translator="deepl"):
         # Get settings position of the text
@@ -248,7 +247,7 @@ def setupDeeplApiKey():
     if not os.path.exists(path):
         os.makedirs(path)
 
-    print("[INFO] Select source translate (required) and set API Key (not required)")
+    print(colored('''[INFO] Select source translate (required) and set API Key (not required)''', "blue"))
     def prompt(str):
         valid_input = False
         while not valid_input:
@@ -265,7 +264,7 @@ def setupDeeplApiKey():
 
     with open('config/api-key.json', 'w') as outfile:
         json.dump(settings, outfile)
-    print("[INFO] Settings configuration complete")
+    print(colored('''[INFO] Settings configuration complete"''', "blue"))
 
 
 #############
@@ -278,19 +277,24 @@ def on_release(key):
             with open("config/api-key.json") as f:
                 api_key = json.load(f)
             Translator.on_take_screenshot(apiKey=api_key['deepl_api_key'], deep_translator=api_key['source_translate']) # 18704e15-6cce-db4f-5b88-6928c8529b1f:fx
-        '''QUIT'''
-        if key == keyboard.Key.f3:
-            Translator.clean_up()
         '''REMOVE ALL SETTINGS'''
-        if key == keyboard.Key.f4:
+        if key == keyboard.Key.f3:
             path_exists = os.path.exists("config/config.json")
+            path_exists_translate = os.path.exists("config/api-key.json")
             if path_exists:
                 os.remove("config/config.json")
+            if path_exists_translate:
                 os.remove("config/api-key.json")
             print(colored('''[INFO] Config and settings are deleted, restart app for configure''', "green"))
             os._exit(0)
+        '''QUIT'''
+        if key == keyboard.Key.f4:
+            Translator.clean_up()
         '''SETUP SETTINGS'''
         if key == keyboard.Key.f6:
+            path_exists_translate = os.path.exists("config/api-key.json")
+            if path_exists_translate:
+                os.remove("config/api-key.json")
             setupDeeplApiKey()
         '''SELECT NEW ZONE'''
         if key == keyboard.Key.f7:
