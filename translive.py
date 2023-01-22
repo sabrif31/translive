@@ -160,6 +160,9 @@ class IntervalTransitive(Transitive):
             pyperclip.copy(ocr_result)
 
 class Translator(Transitive):
+    def __init__(self, box_constant = 416, collect_data = False, mouse_delay = 0.0001, debug = False):
+        print(colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO RESET ALL\n[INFO] PRESS 'F4' TO QUIT\n[INFO] PRESS 'F6' TO SET SETTINGS\n[INFO] PRESS 'F7' TO RE-SELECT ZONE AT TRANSLATE''', "blue"))
+        
     pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
     current_folder = os.getcwd()
@@ -168,10 +171,7 @@ class Translator(Transitive):
         os.makedirs(current_folder + '\\img')
     path = r'%s\\img\\translate.png' % current_folder
 
-    def __init__(self, box_constant = 416, collect_data = False, mouse_delay = 0.0001, debug = False):
-        print(colored('''\n[INFO] PRESS 'F2' TO TRANSLATE\n[INFO] PRESS 'F3' TO RESET ALL\n[INFO] PRESS 'F4' TO QUIT\n[INFO] PRESS 'F6' TO SET SETTINGS\n[INFO] PRESS 'F7' TO RE-SELECT ZONE AT TRANSLATE''', "blue"))
-
-    def on_take_screenshot(apiKey="", deep_translator="deepl"):
+    def on_take_screenshot(apiKey="", deep_translator="deepl", source="en", target="fr"):
         # Get settings position of the text
         path_exists_config = os.path.exists("config/config.json")
         if path_exists_config: #  and force == False
@@ -188,9 +188,9 @@ class Translator(Transitive):
         ### TRANSLATE ###
         #################
         if deep_translator == 'google':
-            translated = GoogleTranslator(source='en', target='fr').translate(text=txt)
+            translated = GoogleTranslator(source=source, target=target).translate(text=txt)
         if deep_translator == 'deepl':
-            translated = DeeplTranslator(api_key=apiKey, source='en', target='fr', use_free_api=True).translate(txt)  # output -> Weiter so, du bist großartig
+            translated = DeeplTranslator(api_key=apiKey, source=source, target=target, use_free_api=True).translate(txt)  # output -> Weiter so, du bist großartig
 
         from rich import print
         tree = Tree("\nTranslation")
@@ -210,7 +210,8 @@ class Translator(Transitive):
 
 arg_parser = argparse.ArgumentParser(description=__doc__)
 arg_parser.add_argument(
-    "langs",
+    "-l",
+    "--langs",
     nargs="?",
     default="eng",
     help='languages passed to tesseract, eg. "eng+fra" (default: %(default)s)',
@@ -221,6 +222,13 @@ arg_parser.add_argument(
     type=int,
     default=None,
     help="select a screen region then take textshots every INTERVAL milliseconds",
+)
+arg_parser.add_argument(
+    "-s",
+    "--setup",
+    type=bool,
+    default=False,
+    help="Set settings",
 )
 
 def take_textshot(langs, interval):
@@ -260,7 +268,9 @@ def setupDeeplApiKey():
 
     api_key = prompt("Your API Key: ")
     source_translate = prompt("Select source for translate (deepl, google, etc..): ")
-    settings = {"deepl_api_key": api_key, "source_translate": source_translate}
+    source_lang_translate = prompt("Select default source language (en, fr, es, etc...): ")
+    target_lang_translate = prompt("Select default target language (en, fr, es, etc...): ")
+    settings = {"deepl_api_key": api_key, "source_translate": source_translate, "target": target_lang_translate, "source": source_lang_translate }
 
     with open('config/api-key.json', 'w') as outfile:
         json.dump(settings, outfile)
@@ -276,7 +286,7 @@ def on_release(key):
         if key == keyboard.Key.f2:
             with open("config/api-key.json") as f:
                 api_key = json.load(f)
-            Translator.on_take_screenshot(apiKey=api_key['deepl_api_key'], deep_translator=api_key['source_translate']) # 18704e15-6cce-db4f-5b88-6928c8529b1f:fx
+            Translator.on_take_screenshot(apiKey=api_key['deepl_api_key'], deep_translator=api_key['source_translate'], source=api_key['source'], target=api_key['target']) # 18704e15-6cce-db4f-5b88-6928c8529b1f:fx
         '''REMOVE ALL SETTINGS'''
         if key == keyboard.Key.f3:
             path_exists = os.path.exists("config/config.json")
@@ -316,15 +326,16 @@ def main():
     |______|_____|   \/   |______|    |_|  |_|  \_\/_/    \_\_| \_|_____/|______/_/    \_\_|  \____/|_|  \_\ 
     \n(Neural Network Translate)''', "blue"))
 
+    args = arg_parser.parse_args()
+
     """Configure API KEY and source Translate"""
     path_exists_settings = os.path.exists("config/api-key.json")
-    if not path_exists_settings: #  and force == False
+    if not path_exists_settings or args.setup:
         setupDeeplApiKey()
         
     """Select region on your screen for the area translate"""
     path_exists_config = os.path.exists("config/config.json")
-    if not path_exists_config: #  and force == False
-        args = arg_parser.parse_args()
+    if not path_exists_config:
         take_textshot(args.langs, args.interval)
 
     # from lib.translator import Translator

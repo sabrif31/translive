@@ -24,6 +24,17 @@ To update settings:
 python translive.py setup
 ```
 
+## Setup
+```           
+python translive.py --setup=True
+```
+
+## Create app .exe
+```           
+pyinstaller --onefile translive.py
+```
+
+
 ## Issues
 
 ## Contributing
