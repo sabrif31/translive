@@ -1,0 +1,9 @@
+opencv-python
+argparse
+pytesseract
+PyQt5
+deep_translator
+rich
+pynput
+pyautogui
+termcolor

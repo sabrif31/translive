@@ -1,0 +1,5 @@
+config
+build
+dist
+img
+lib/__pycache__
