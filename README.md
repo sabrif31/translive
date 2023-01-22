@@ -17,11 +17,11 @@ pip install -r requirements.txt
 
 ## Usage
 ```           
-python transitive.py
+python translive.py
 ```
-To update sensitivity settings:
+To update settings:
 ```           
-python transitive.py setup
+python translive.py setup
 ```
 
 ## Issues
